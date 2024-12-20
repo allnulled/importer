@@ -1,0 +1,12 @@
+{
+  "name": "@allnulled/importer",
+  "version": "1.0.0",
+  "description": "Import JavaScript, CSS and text easily.",
+  "main": "importer.js",
+  "scripts": {
+    "test": "npx http-server -c-1 . -o"
+  },
+  "keywords": ["module","web","async","import","require"],
+  "author": "allnulled",
+  "license": "WTFPL"
+}

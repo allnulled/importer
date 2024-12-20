@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importer</title>
+    <script src="importer.js"></script>
+</head>
+<body>
+    <pre id="test"></pre>
+    <pre id="error"></pre>
+    <script>
+        window.addTest = function(text) {
+            document.querySelector("#test").textContent += text + "\n";
+        };
+        window.setError = function(text) {
+            document.querySelector("#error").textContent += text + "\n";
+        };
+        const test = async function() {
+            try {
+                addTest("Test of Importer class");
+                await Importer.scriptSrc("test/scriptSrc.js");
+                await Importer.scriptSrcModule("test/scriptSrcModule.js");
+                await Importer.linkStylesheet("test/linkStylesheet.css");
+                const txt = await Importer.text("test/text.txt");
+                if(txt.startsWith("...")) {
+                    addTest("Test of Importer.text completed");
+                } else {
+                    throw new Error("Text failed");
+                }
+                addTest("Test of Importer.linkStylesheet completed");
+                addTest("Test completed successfully!");
+            } catch (error) {
+                setError(error.name + ": " + error.message + "\n" + error.stack);
+            }
+        };
+        window.addEventListener("load", test);
+    </script>
+</body>
+</html>
