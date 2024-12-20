@@ -13,7 +13,7 @@ npm install -s @allnulled/importer
 ### 1) Import from HTML:
 
 ```html
-<script src="node_modules/@allnulled/importer.js"></script>
+<script src="node_modules/@allnulled/importer/importer.js"></script>
 ```
 
 ### 2) Signature of the API:
