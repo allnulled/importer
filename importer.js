@@ -13,6 +13,15 @@ const Importer = class {
     }
   }
 
+  $error(error, clue = false) {
+    console.error("Error: " + error.name);
+    console.error("Message: " + error.message);
+    console.error("Stack: " + error.stack);
+    if(clue) {
+      console.error("Clue: " + clue);
+    }
+  }
+
   constructor(total_modules = 0, options_input = {}) {
     const options = Object.assign({}, {
       id: "#intersitial",
@@ -165,6 +174,7 @@ const Importer = class {
 
   async scriptSrc(src) {
     this.$trace("scriptSrc", arguments);
+    console.log(`[OK][Importer] Loading «${src}» as «script.src» ${this.$getMillisecondsOfLife()}`);
     await new Promise((resolve, reject) => {
       const script = document.createElement("script");
       script.src = src;
@@ -178,6 +188,7 @@ const Importer = class {
 
   async scriptSrcModule(src) {
     this.$trace("scriptSrcModule", arguments);
+    console.log(`[OK][Importer] Loading «${src}» as «script.src.module» ${this.$getMillisecondsOfLife()}`);
     await new Promise((resolve, reject) => {
       const script = document.createElement("script");
       script.src = src;
@@ -192,18 +203,67 @@ const Importer = class {
 
   async scriptAsync(url, context = {}) {
     this.$trace("scriptAsync", arguments);
+    console.log(`[OK][Importer] Loading «${url}» as «script.async» ${this.$getMillisecondsOfLife()}`);
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Failed to fetch script: ${url}`);
     const scriptText = await response.text();
     const AsyncFunction = (async function () { }).constructor;
-    const asyncFunction = new AsyncFunction(...Object.keys(context), scriptText);
-    const result = await asyncFunction(...Object.values(context));
-    this.$increaseLoadedModules("script.async", url);
-    return result;
+    let scriptCode = scriptText;
+    try {
+      const asyncFunction = new AsyncFunction(...Object.keys(context), scriptText);
+      scriptCode = asyncFunction.toString();
+      const result = await asyncFunction(...Object.values(context));
+      return result;
+    } catch (error) {
+      this.$error(error, `Error evaluating «script.async» from «${url}» in code «\n${this.$breakLines(scriptCode)}\n»`);
+      throw error;
+    } finally {
+      this.$increaseLoadedModules("script.async", url);
+    }
+  }
+
+  $wrapInTryCatch(code) {
+    let js = "";
+    js += `try {\n`;
+    js += `${code}\n`;
+    js += `} catch(error) {\n`;
+    js += `  console.error('Error in «script.async» execution:');\n`;
+    js += `  console.error(error.name);\n`;
+    js += `  console.error(error.message);\n`;
+    js += `  console.error(error.stack);\n`;
+    js += `  throw error;\n`;
+    js += `}\n`;
+    js = js.replace("***THIS_IS_A_MAGIC_TOKEN_TO_NOT_USE_NEVER_EVER***", JSON.stringify(js));
+    return js;
+  }
+
+  $padLeft(input, spaces = 2, charc = " ") {
+    let out = "" + input;
+    while(out.length < spaces) {
+      out = charc + out;
+    }
+    return out;
+  }
+
+  $breakLines(code) {
+    const lines = code.split(/(\r\n|\r|\n)/g).filter(l => {
+      return l !== "\n" && l !== "";
+    });
+    const maxDigits = (lines.length + "").length +1;
+    let out = "";
+    for(let index=0; index<lines.length; index++) {
+      const line = lines[index];
+      out += this.$padLeft(index+1, maxDigits, " ");
+      out += " | ";
+      out += line;
+      out += "\n";
+    }
+    return out;
   }
 
   async linkStylesheet(href) {
     this.$trace("linkStylesheet", arguments);
+    console.log(`[OK][Importer] Loading «${href}» as «link.stylesheet.css» ${this.$getMillisecondsOfLife()}`);
     await new Promise((resolve, reject) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -219,6 +279,7 @@ const Importer = class {
 
   async text(url) {
     this.$trace("text", arguments);
+    console.log(`[OK][Importer] Loading «${url}» as «text» ${this.$getMillisecondsOfLife()}`);
     const response = await fetch(url);
     this.$increaseLoadedModules("text", url);
     if (!response.ok) throw new Error(`Failed to fetch text: ${url}`);
