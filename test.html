@@ -19,16 +19,16 @@
         const test = async function() {
             try {
                 addTest("Test of Importer class");
-                await Importer.scriptSrc("test/scriptSrc.js");
-                await Importer.scriptSrcModule("test/scriptSrcModule.js");
-                await Importer.linkStylesheet("test/linkStylesheet.css");
-                const txt = await Importer.text("test/text.txt");
+                await importer.scriptSrc("test/scriptSrc.js");
+                await importer.scriptSrcModule("test/scriptSrcModule.js");
+                await importer.linkStylesheet("test/linkStylesheet.css");
+                const txt = await importer.text("test/text.txt");
                 if(txt.startsWith("...")) {
-                    addTest("Test of Importer.text completed");
+                    addTest("Test of importer.text completed");
                 } else {
                     throw new Error("Text failed");
                 }
-                addTest("Test of Importer.linkStylesheet completed");
+                addTest("Test of importer.linkStylesheet completed");
                 addTest("Test completed successfully!");
             } catch (error) {
                 setError(error.name + ": " + error.message + "\n" + error.stack);
