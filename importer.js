@@ -14,12 +14,25 @@ const Importer = class {
   }
 
   $error(error, clue = false) {
-    console.error("Error: " + error.name);
-    console.error("Message: " + error.message);
-    console.error("Stack: " + error.stack);
+    let errorText = "";
+    errorText += "[ERROR]   " + error.name + "\n";
+    errorText += "[MESSAGE] " + error.message + "\n";
+    errorText += "[STACK]\n" + error.stack.trim().split("\n").map(line => {
+      return "    | " + this.$reverseStackLine(line);
+    }).join("\n") + "";
     if(clue) {
-      console.error("Clue: " + clue);
+      errorText = errorText + "\n[CLUE]\n" + clue + "";
     }
+    console.error(errorText);
+  }
+
+  $reverseStackLine(text) {
+    const index = text.indexOf('@');
+    if (index === -1) {
+      // Si no hay @, devolvemos el texto completo y una cadena vacía
+      return [text, ''];
+    }
+    return [text.slice(index + 1), " @ ", text.slice(0, index)].join("");
   }
 
   constructor(total_modules = 0, options_input = {}) {
