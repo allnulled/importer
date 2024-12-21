@@ -1,6 +1,6 @@
 {
   "name": "@allnulled/importer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Import JavaScript, CSS and text easily.",
   "main": "importer.js",
   "scripts": {
